@@ -1,10 +1,34 @@
-window.onload = () => {
+function initFlappyGoobert() {
+    stopGame();
+    body = document.getElementById("main");
+
+    if (!body) return;
+
+    if (window.innerWidth <= 640) {
+        width = 12;
+        height = 18;
+    } else {
+        width = 20;
+        height = 15; 
+    }
+    setBodySize();
+
+    body.innerHTML = "";
+    pipes = [];
+    countdown = 0;
+    score = 0;
+    gameOver = false; // Reset game-over status
+
+    bird.x = gridSize * 3;
+    bird.y = Math.floor((height * gridSize) / 2);
+    bird.velocity = 0;
+
     bird.div = createBirdDiv();
     bird.eyes = createEyeDiv();
     bird.div.appendChild(bird.eyes);
+    updateScoreDisplay();
 
-    setBodySize();
-    start(30);
+    start(30, flappyGameloop);
 }
 
 let bird = {
@@ -18,6 +42,7 @@ let bird = {
 }
 let countdown = 0; 
 let pipes = [];
+let score = 0;
 class Pipe {
     constructor() {
         this.x = parseInt(body.style.width) + 20;
@@ -26,6 +51,7 @@ class Pipe {
         this.firstPipeHeight = Math.random() * (body.offsetHeight - this.gapSize) * gridSize / 64;
         this.div = createPipeDivs(this);
         this.dead = false;
+        this.counted = false;
     }
 
     move() {
@@ -37,9 +63,14 @@ class Pipe {
     }
 }
 
-function gameloop() {
+function flappyGameloop() {
+    if (gameOver) return;
+
     handleKeyPress();
     moveBird();
+
+    if (gameOver) return;
+
     if(countdown <= 0) {
         pipes.push(new Pipe());
         countdown = Math.floor(Math.random() * 60) + 45; 
@@ -51,10 +82,15 @@ function gameloop() {
             pipes.splice(i, 1);
         } else {
             renderPipe(pipe);
+            if (!pipe.counted && (pipe.x + pipe.width * gridSize) < bird.x) {
+                pipe.counted = true;
+                score += 1;
+                updateScoreDisplay();
+            }
         }
     }
 
-    setPosition(bird.div, bird.x, bird.y);
+    setFlappyPosition(bird.div, bird.x, bird.y);
     bird.eyes.style.top = 
         Math.max(Math.min((bird.velocity) * (gridSize / 64), gridSize * 0.5), -(gridSize * 0.5)) 
         + "px";
@@ -67,7 +103,7 @@ function moveBird() {
 
     checkPipeIntersection();
 
-    if(bird.y > (height+1) * gridSize || bird.y + gridSize < -gridSize / 2) resetGame();
+    if(bird.y > (height+1) * gridSize || bird.y + gridSize < -gridSize / 2) endFlappyRound();
 
 }
 function checkPipeIntersection() {
@@ -115,12 +151,24 @@ function checkPipeIntersection() {
                 checkCircleBoxIntersection(circle, bottomPipe)
             ) {
                 // Intersecting with a pipe
-                resetGame();
+                endFlappyRound();
             } else {
                 // Intersecting with water
                 // david.cleanliness += 0.04; // Wash goobert
             }
         }
+    }
+}
+
+function endFlappyRound() {
+    if (typeof stopGame === "function") {
+        stopGame();
+    }
+
+    if (typeof window.onFlappyGameOver === "function") {
+        window.onFlappyGameOver();
+    } else {
+        resetGame();
     }
 }
 function createBirdDiv() {
@@ -131,7 +179,7 @@ function createBirdDiv() {
         gridSize + "px";
     cell.style.backgroundPosition = "0 0";
 
-    setPosition(cell, bird.x, bird.y);
+    setFlappyPosition(cell, bird.x, bird.y);
     cell.id = "bird";
     cell.classList.add("bird");
     cell.style.width = gridSize + "px";
@@ -226,7 +274,14 @@ function renderPipe(pipe) {
     pipe.div.style.left = pipe.x + "px";
 }
 
-function setPosition(div, x, y) {
+function updateScoreDisplay() {
+    const scoreElement = document.getElementById("flappy-score");
+    if (scoreElement) {
+        scoreElement.textContent = "Score: " + score;
+    }
+}
+
+function setFlappyPosition(div, x, y) {
     div.style.left = x  + "px";
     div.style.top = y + "px";
 }

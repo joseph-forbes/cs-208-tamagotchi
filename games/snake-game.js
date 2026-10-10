@@ -1,23 +1,39 @@
-window.onload = () => {    
+function initSnakeGame(boardWidth, boardHeight) {
+    if (typeof stopGame === "function") {
+        stopGame();
+    }
+    if (typeof refreshGameBody === "function") {
+        refreshGameBody();
+    }
+    if (!body) return;
+
+    width = Math.max(6, parseInt(boardWidth, 10) || 15) - 1;
+    height = Math.max(6, parseInt(boardHeight, 10) || 15) - 1;
+    setBodySize();
+
+    body.innerHTML = "";
+    snakeDivs.innerHTML = "";
     snakeDivs.id = "snakeDivs";
     body.appendChild(snakeDivs);
-    // Create an HTML element for each part of the snake
-    for (position of snake.positions) {
+
+    snake = createInitialSnake();
+    apple = createInitialApple();
+
+    for (let position of snake.positions) {
         position.asset = [assets.right, assets.right];
         position.div = createSnakeDiv(position.x, position.y, position.id, position.asset);
         updateImage(position);
     }
-    // Initialize snake head
+
     snake.head = snake.positions[0];
     snake.head.asset[1] = assets.head;
     updateImage(snake.head);
 
-    // Create an HTML element for the apple
     createAppleDiv();
     apple.div = document.getElementById("apple");
     setPosition(apple.div, apple.x, apple.y);
 
-    start(10);
+    start(10, gameloop);
 }
 
 const assets = {
@@ -29,31 +45,34 @@ const assets = {
 
     size: 64 // Asset size in pixels
 }
-const windowSize = new URLSearchParams(window.location.search);
-
 const snakeDivs = document.createElement("div");
+let snake = null;
+let apple = null;
 
-// Update game size
-width = parseInt(windowSize.get("width")) - 1 || 15;
-height = parseInt(windowSize.get("height")) - 1 || 15;
-
-setBodySize();
-
-let snake = {
-    positions: [
-        { x: width > 10 ? 6 : 3, y: Math.floor(height / 2), id: 0 },
-        { x: width > 10 ? 5 : 2, y: Math.floor(height / 2), id: 1 },
-        { x: width > 10 ? 4 : 1, y: Math.floor(height / 2), id: 2 }
-    ],
-    velocity: {
-        y: 0,
-        x: 1,
+function createInitialSnake() {
+    const startY = Math.floor(height / 2);
+    return {
+        positions: [
+            { x: width > 10 ? 6 : 3, y: startY, id: 0 },
+            { x: width > 10 ? 5 : 2, y: startY, id: 1 },
+            { x: width > 10 ? 4 : 1, y: startY, id: 2 }
+        ],
+        velocity: {
+            y: 0,
+            x: 1,
+            direction: assets.right
+        },
+        head: { x: width > 10 ? 6 : 3, y: startY, id: 0 },
         direction: assets.right
-    },
-    head: { x: 4, y: Math.floor(height / 2), id: 2},
-    direction: "right"
+    };
 }
-let apple = { x: width > 15 ? width - 8 : width - 3, y: Math.floor(height / 2) };
+
+function createInitialApple() {
+    return {
+        x: width > 15 ? width - 8 : width - 3,
+        y: Math.floor(height / 2)
+    };
+}
 
 function gameloop() {
     handleKeyPress();

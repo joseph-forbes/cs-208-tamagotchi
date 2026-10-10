@@ -19,6 +19,8 @@ class TopElement extends React.Component {
 	render() {
 		return(
 			<>
+				<SharedAudioManager />
+
 				{this.room}
 
 				{this.gooberts.map((goobert, i) => (

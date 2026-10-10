@@ -1,30 +1,11 @@
 "use strict";
 
-class Hub extends React.Component {
+class TestGoobert extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
-    return /*#__PURE__*/React.createElement("main", {
-      id: "main",
-      className: "hub"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "tree-container"
-    }, /*#__PURE__*/React.createElement("img", {
-      src: "hub-images/gooberts_tree.png",
-      alt: "GOOBERTS HUB",
-      className: "pixelated-tree",
-      id: "goobert-tree"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-body-area"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-legs-area"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-mouth-area"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-eyes-area"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-body-color"
-    }), /*#__PURE__*/React.createElement("div", {
-      id: "tree-legs-color"
-    }), /*#__PURE__*/React.createElement("div", {
+    return /*#__PURE__*/React.createElement("div", {
       className: "goobert-container"
     }, /*#__PURE__*/React.createElement("img", {
       id: "goobert-legs",
@@ -38,7 +19,86 @@ class Hub extends React.Component {
     }), /*#__PURE__*/React.createElement("img", {
       id: "goobert-eyes",
       src: "assets/goobert-parts/Transparent-BG.png"
-    }))), /*#__PURE__*/React.createElement("div", {
+    }));
+  }
+  setBodyType(type) {
+    this.bodyType = type;
+    this.setState({});
+    const element = document.getElementById(this.bodyId);
+    element.style.backgroundPositionY = this.bodyType * -64 + 'px';
+    console.log(this.name + "'s body type set.");
+  }
+  setBodyColor() {
+    const element = document.getElementById(this.bodyId);
+    element.style.backgroundPositionX = this.bodyColor * -64 + 'px';
+    console.log(this.name + "'s body color set.");
+  }
+  setLegsType() {
+    const element = document.getElementById(this.legId);
+    element.style.backgroundPositionY = this.legType * -64 + 'px';
+    console.log(this.name + "'s leg type set.");
+  }
+  setLegsColor() {
+    const element = document.getElementById(this.legId);
+    element.style.backgroundPositionX = this.legColor * -64 + 'px';
+    console.log(this.name + "'s leg color set.");
+  }
+  setEyes() {
+    const element = document.getElementById(this.eyeId);
+    element.style.backgroundPositionY = this.eyeType * -64 + 'px';
+    console.log(this.name + "'s eye type set.");
+  }
+  setEyeExpression() {
+    const element = document.getElementById(this.eyeId);
+    element.style.backgroundPositionX = this.eyeExpression * -64 + 'px';
+    console.log(this.name + "'s eye expression set.");
+  }
+  setMouth() {
+    const element = document.getElementById(this.mouthId);
+    element.style.backgroundPositionY = this.mouthType * -64 + 'px';
+    console.log(this.name + "'s mouth type set.");
+  }
+  setMouthExpression() {
+    const element = document.getElementById(this.mouthId);
+    element.style.backgroundPositionX = this.mouthExpression * -64 + 'px';
+    console.log(this.name + "'s mouth expression set.");
+    this.setState({});
+  }
+}
+class Hub extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return /*#__PURE__*/React.createElement("main", {
+      id: "main",
+      className: "hub"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "tree-container"
+    }, /*#__PURE__*/React.createElement("img", {
+      src: "hub-images/gooberts_tree.png",
+      alt: "GOOBERTS HUB",
+      className: "pixelated-tree",
+      id: "goobert-tree"
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-body-area",
+      onClick: changeBodyType
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-legs-area",
+      onClick: changeLegType
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-mouth-area",
+      onClick: changeMouth
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-eyes-area",
+      onClick: changeEyes
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-body-color",
+      onClick: changeBodyColor
+    }), /*#__PURE__*/React.createElement("div", {
+      id: "tree-legs-color",
+      onClick: changeLegColor
+    }), /*#__PURE__*/React.createElement(TestGoobert, null)), /*#__PURE__*/React.createElement("div", {
       className: "sleep-door-container"
     }, /*#__PURE__*/React.createElement("img", {
       src: "index-images/DreamDoor.webp",
@@ -70,13 +130,19 @@ class Hub extends React.Component {
     }, /*#__PURE__*/React.createElement("img", {
       src: "hub-images/leave-door.png",
       alt: "LEAVE",
-      id: "leave-door"
-    })));
+      id: "leave-door",
+      onClick: () => {
+        window.location.href = "index.html";
+      }
+    })), /*#__PURE__*/React.createElement(SettingsPanel, {
+      buttonClassName: "game-room-settings-button",
+      panelClassName: "game-room-settings-panel"
+    }));
   }
 }
 
 /* Basic asset index selectors. */
-let assets = {
+let hubAssets = {
   bodyType: 0,
   bodyColor: 0,
   legType: 0,
@@ -89,57 +155,57 @@ let assets = {
 
 /* Controls for the test goobert */
 const randomizeFeatures = () => {
-  assets.bodyType = Math.floor(Math.random() * 7);
-  assets.bodyColor = Math.floor(Math.random() * 7);
-  assets.legType = Math.floor(Math.random() * 7);
-  assets.legColor = Math.floor(Math.random() * 7);
-  assets.eyeType = Math.floor(Math.random() * 10);
-  assets.mouthType = Math.floor(Math.random() * 11);
-  setBodyType(bodyType);
-  setBodyColor(bodyColor);
-  setLegsType(legType);
-  setLegsColor(legColor);
-  setEyes(eyeType);
-  setMouth(mouthType);
+  hubAssets.bodyType = Math.floor(Math.random() * 7);
+  hubAssets.bodyColor = Math.floor(Math.random() * 7);
+  hubAssets.legType = Math.floor(Math.random() * 7);
+  hubAssets.legColor = Math.floor(Math.random() * 7);
+  hubAssets.eyeType = Math.floor(Math.random() * 10);
+  hubAssets.mouthType = Math.floor(Math.random() * 11);
+  setBodyType(hubAssets.bodyType);
+  setBodyColor(hubAssets.bodyColor);
+  setLegsType(hubAssets.legType);
+  setLegsColor(hubAssets.legColor);
+  setEyes(hubAssets.eyeType);
+  setMouth(hubAssets.mouthType);
   console.log("Features randomized.");
 };
 const changeBodyType = function () {
-  bodyType = bodyType == 6 ? 0 : bodyType + 1;
-  setBodyType(bodyType);
+  hubAssets.bodyType = hubAssets.bodyType == 6 ? 0 : hubAssets.bodyType + 1;
+  setBodyType(hubAssets.bodyType);
 };
 const changeBodyColor = function () {
-  bodyColor = bodyColor == 6 ? 0 : bodyColor + 1;
-  setBodyColor(bodyColor);
+  hubAssets.bodyColor = hubAssets.bodyColor == 6 ? 0 : hubAssets.bodyColor + 1;
+  setBodyColor(hubAssets.bodyColor);
 };
 const changeLegType = function () {
-  legType = legType == 6 ? 0 : legType + 1;
-  setLegsType(legType);
+  hubAssets.legType = hubAssets.legType == 6 ? 0 : hubAssets.legType + 1;
+  setLegsType(hubAssets.legType);
 };
 const changeLegColor = function () {
-  legColor = legColor == 6 ? 0 : legColor + 1;
-  setLegsColor(legColor);
+  hubAssets.legColor = hubAssets.legColor == 6 ? 0 : hubAssets.legColor + 1;
+  setLegsColor(hubAssets.legColor);
 };
 const changeEyes = function () {
-  eyeType = eyeType == 9 ? 0 : eyeType + 1;
-  setEyes(eyeType);
+  hubAssets.eyeType = hubAssets.eyeType == 9 ? 0 : hubAssets.eyeType + 1;
+  setEyes(hubAssets.eyeType);
 };
 const changeEyesExpression = () => {
-  eyeExpression = eyeExpression == 6 ? 0 : eyeExpression + 1;
-  setEyeExpression(eyeExpression);
+  hubAssets.eyeExpression = hubAssets.eyeExpression == 6 ? 0 : hubAssets.eyeExpression + 1;
+  setEyeExpression(hubAssets.eyeExpression);
 };
 const changeMouth = function () {
-  mouthType = mouthType == 10 ? 0 : mouthType + 1;
-  setMouth(mouthType);
+  hubAssets.mouthType = hubAssets.mouthType == 10 ? 0 : hubAssets.mouthType + 1;
+  setMouth(hubAssets.mouthType);
 };
 const changeMouthExpression = () => {
-  mouthExpression = mouthExpression == 5 ? 0 : mouthExpression + 1;
-  setMouthExpression(mouthExpression);
+  hubAssets.mouthExpression = hubAssets.mouthExpression == 5 ? 0 : hubAssets.mouthExpression + 1;
+  setMouthExpression(hubAssets.mouthExpression);
 };
 
 /* The following functions set the features of the test goobert. */
 const setBodyType = assetIndex => {
   const element = document.getElementById('goobert-body');
-  element.style.backgroundPositionY = assets.bodyType * -64 + 'px';
+  element.style.backgroundPositionY = hubAssets.bodyType * -64 + 'px';
   console.log("Body type set.");
 };
 const setBodyColor = assetIndex => {
@@ -176,64 +242,4 @@ const setMouthExpression = assetIndex => {
   const element = document.getElementById('goobert-mouth');
   element.style.backgroundPositionX = assetIndex * -64 + 'px';
   console.log("Mouth expression set.");
-};
-
-// CHANGING THE GOOBERTS EYES
-let eyesArea = document.getElementById("tree-eyes-area");
-eyesArea.onclick = function () {
-  changeEyes();
-};
-
-// CHANGING GOOBERT BODY
-let bodyArea = document.getElementById("tree-body-area");
-bodyArea.onclick = function () {
-  changeBodyType();
-};
-
-// CHANGING GOOBERT LEGS
-let legArea = document.getElementById("tree-legs-area");
-legArea.onclick = function () {
-  changeLegType();
-};
-
-// CHANGING GOOBERT MOUTH
-let mouthArea = document.getElementById("tree-mouth-area");
-mouthArea.onclick = function () {
-  changeMouth();
-};
-
-// CHANGING GOOBERT BODY COLOR
-let bodyAreaColor = document.getElementById("tree-body-color");
-bodyAreaColor.onclick = function () {
-  changeBodyColor();
-};
-
-//CHANGING GOOBERT LEG COLOR
-let legAreaColor = document.getElementById("tree-legs-color");
-legAreaColor.onclick = function () {
-  changeLegColor();
-};
-
-// GO TO BEDROOM
-let sleepDoor = document.getElementById("sleep-door");
-sleepDoor.onclick = function () {
-  load("bedroom");
-};
-
-// GO TO GAME ROOM
-let gameDoor = document.getElementById("game-door");
-gameDoor.onclick = function () {
-  load("gameRoom");
-};
-
-// GO TO SHOP
-let shopDoor = document.getElementById("shop-door");
-shopDoor.onclick = function () {
-  load("shop");
-};
-
-// LEAVE GAME
-let leaveDoor = document.getElementById("leave-door");
-leaveDoor.onclick = function () {
-  window.location.href = "index.html";
 };

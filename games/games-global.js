@@ -1,31 +1,50 @@
 let game;
+var body = null;
 
-function start(fps) {
+function refreshGameBody() {
+    body = document.getElementById("main");
+    return body;
+}
+
+function stopGame() {
+    if (game) {
+        window.clearInterval(game);
+        game = null;
+    }
+    document.removeEventListener("keydown", keypress);
+    document.removeEventListener("keyup", keyReleased);
+}
+
+function start(fps, gameLoop) {
+    stopGame();
+    refreshGameBody();
+    if (!body) return;
+
     // Add key press event & start game
     document.addEventListener("keydown", keypress);
     document.addEventListener("keyup", keyReleased);
-    game = setInterval(gameloop, 1000 / fps); // 10FPS
+    game = setInterval(gameLoop, 1000 / fps); // 10FPS
 }
-
-const body = document.getElementById("main");
 const keys = [];
 let width = 15, height = 15;
 
 // Update grid size to a power of 2, since it helps render images better
 function getGridSize() {
+    const columns = Math.max(width + 1, 1);
+    const rows = Math.max(height + 1, 1);
     const desired = Math.floor(
         Math.min(
-            window.innerWidth / width,
-            window.innerHeight / height
+            window.innerWidth / columns,
+            window.innerHeight / rows
         )
     );
 
-    if (desired >= 128) return 128;
-    if (desired >= 64) return 64;
-    if (desired >= 32) return 32;
-    return 16;
+    return Math.max(desired, 4);
 }
 function setBodySize() {
+    refreshGameBody();
+    if (!body) return;
+
     // Update grid size
     gridSize = getGridSize();
 
@@ -38,12 +57,16 @@ let gridSize = getGridSize();
 
 
 function resetGame() {
-    window.clearInterval(game);
+    stopGame();
 
     // Pause for a quarter second to let the player know they died
-    // Then send the player back to the game room
+    // Then send the player back to game room
     setTimeout(() => {
-        // load("gameRoom");
+        if (typeof load === "function") {
+            load("gameRoom");
+        } else {
+            history.back();
+        }
     }, 250);
 }
 function keypress(e) {

@@ -25,6 +25,23 @@ main {
     image-rendering: crisp-edges;
 }
 
+/* ==== GOOBERT SPRITE SHEETS ==== */
+#goobert-legs {
+    background-image: url("assets/goobert-parts/208-tamagotchi-legs.png");
+}
+
+#goobert-body {
+    background-image: url("assets/goobert-parts/208-tamagotchi-bodies.png");
+}
+
+#goobert-mouth {
+    background-image: url("assets/goobert-parts/208-tamagotchi-mouths.png");
+}
+
+#goobert-eyes {
+    background-image: url("assets/goobert-parts/208-tamagotchi-eyes.png");
+}
+
 /* Positions Goobert relative to tree */
 .goobert-container {
     position: absolute;
@@ -191,4 +208,33 @@ main {
     width: 130px;
     height: auto;
     cursor: pointer;
+}
+
+/* Settings button */
+.hub .settings-fab {
+    position: fixed !important;
+    bottom: 25px !important;
+    right: 25px !important;
+    top: auto !important;
+    left: auto !important;
+
+    width: 55px;
+    height: 55px;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #ff922b;
+    border: 3px solid black;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.hub .settings-fab img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
 }

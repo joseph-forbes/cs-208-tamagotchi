@@ -15,7 +15,7 @@ class TopElement extends React.Component {
     this.room = rooms.hub;
   }
   render() {
-    return /*#__PURE__*/React.createElement(React.Fragment, null, this.room, this.gooberts.map((goobert, i) => /*#__PURE__*/React.createElement("div", {
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SharedAudioManager, null), this.room, this.gooberts.map((goobert, i) => /*#__PURE__*/React.createElement("div", {
       key: i
     }, goobert)));
   }

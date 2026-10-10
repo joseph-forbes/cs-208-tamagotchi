@@ -15,7 +15,7 @@ class Bedroom extends React.Component {
                     <div className="row">
                         <div className="col-5"></div>
                         <div id="exit" className="col-2">
-                            <a className="ml-2" href="hub.html">
+                            <a className="ml-2" onClick={() => load("hub")}>
                                 <img className="img-fluid" src="bedroom-images/exitDoor.webp" />
                             </a>
                         </div>

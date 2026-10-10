@@ -1,22 +1,106 @@
 "use strict";
 
 class FlappyGoobert extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showPlayAgain: false
+        };
+    }
+
+    loadScript(src, id, onReady) {
+        const existing = document.getElementById(id);
+        if (existing) {
+            if (existing.dataset.loaded === "true") {
+                onReady();
+                return;
+            }
+            existing.addEventListener("load", onReady, { once: true });
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.id = id;
+        script.src = src;
+        script.defer = true;
+        script.onload = () => {
+            script.dataset.loaded = "true";
+            onReady();
+        };
+        document.body.appendChild(script);
+    }
 
     componentDidMount() {
+        this.loadScript("games/games-global.js", "games-global-script", () => {
+            this.loadScript("games/flappy-goobert.js", "flappy-goobert-script", () => {
+                window.onFlappyGameOver = () => {
+                    this.setState({ showPlayAgain: true });
+                };
+                if (typeof initFlappyGoobert === "function") {
+                    initFlappyGoobert();
+                }
+            });
+        });
+    }
 
-    this.script = document.createElement('script');
-    this.script.src = "../games/flappy-goobert.js";
-    this.script.async = true;
+    componentWillUnmount() {
+        window.onFlappyGameOver = null;
+        if (typeof stopGame === "function") {
+            stopGame();
+        }
+    }
 
-    document.body.appendChild(this.script);
+    playAgain() {
+        this.setState({ showPlayAgain: false }, () => {
+            if (typeof initFlappyGoobert === "function") {
+                initFlappyGoobert();
+            }
+        });
+    }
+
+    handleTouch(event) {
+        // Don't jump when touching a button or settings panel
+        if (event.target.closest("button, .game-room-settings-panel")) {
+            return;
+        }
+        event.preventDefault;
+        if (typeof jump === "function") {
+            jump();
+        }
     }
 
     render() {
         return (
-            <main id="main" className="flappy-goobert container bg-primary">
-                <div id="keys" className="d-block d-md-none vw-100">
-                    <i className="bi bi-arrow-up text-white bg-warning p-1 rounded-pill key keyup vw-100" onClick={() => jump()}></i>
+            <main className="flappy-screen" onTouchStart={(event) => this.handleTouch(event)}>
+                <button
+                    type="button"
+                    className="btn game-return-btn"
+                    onClick={() => load("gameRoom")}>
+                    Back to Game Room
+                </button>
+                <div id="main" className="flappy-board">
+                    <div id="keys" className="d-block d-md-none vw-100">
+                        <i className="bi bi-arrow-up text-white bg-warning p-1 rounded-pill key keyup vw-100" onClick={() => jump()}></i>
+                    </div>
                 </div>
+                <div id="flappy-score" className="flappy-score">Score: 0</div>
+
+                {this.state.showPlayAgain && (
+                    <div className="game-over-panel">
+                        <h3>Game Over</h3>
+                        <button
+                            type="button"
+                            className="btn btn-warning"
+                            onClick={() => this.playAgain()}>
+                            Play Again
+                        </button>
+                    </div>
+                )}
+
+                <SettingsPanel
+                    buttonClassName="game-room-settings-button"
+                    panelClassName="game-room-settings-panel"
+                />
             </main>
         );
     }

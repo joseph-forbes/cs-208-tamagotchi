@@ -60,7 +60,11 @@ class Shop extends React.Component {
     }, "CLOSE")), /*#__PURE__*/React.createElement("div", {
       className: "bg-warning text-white"
     }, /*#__PURE__*/React.createElement("a", {
-      href: "hub.html"
+      href: "#",
+      onClick: e => {
+        e.preventDefault();
+        load("hub");
+      }
     }, "Click here to go to the main hub!")));
   }
 }

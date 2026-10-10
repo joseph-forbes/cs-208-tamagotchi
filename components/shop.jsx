@@ -72,7 +72,10 @@ class Shop extends React.Component {
                 </div>
                 {/* <!-- MAIN HUB LINK --> */}
                 <div className="bg-warning text-white">
-                    <a href="hub.html">
+                    <a href="#" onClick={(e) => {
+                        e.preventDefault();
+                        load("hub");
+                    }}>
                         Click here to go to the main hub!
                     </a>
                 </div>

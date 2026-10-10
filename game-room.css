@@ -1,0 +1,187 @@
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.game-room {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+    background: url("game-room-images/game-room-background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: black;
+}
+/* Return to Hub button */
+.game-room-controls {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
+/* Game room exit is strictly for the exit button */
+.game-room-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #ffd43b;
+    border: 3px solid black
+}
+
+/* Hover state color change for the exit button */
+.game-room-exit:hover {
+    background-color: #ffd53bd0;
+}
+/* Game room exit icon using the arrow-left SVG */
+.game-room-exit-icon {
+    width: 18px;
+    height: 18px;
+    image-rendering: pixelated;
+}
+
+/*--------------------*/
+/*   Game room logo   */
+/*--------------------*/
+.game-room-logo-wrap {
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    display: flex;
+    justify-content: center; 
+}
+
+.game-room-logo {
+    width: 44vw;
+    max-width: 700px;
+    height: auto;
+}
+
+/*--------------------*/
+/*   Arcade machines  */
+/*--------------------*/
+.game-room-machines {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    transform: translateX(-50%);
+    width: 96%;
+    max-width: 1400px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    z-index: 2;
+}
+
+.machine-button {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.machine-button img {
+    display: block;
+    width: 100%;
+    max-height: clamp(110px, 26vh, 320px);
+    height: auto;
+    object-fit: contain;
+}
+
+.machine-disabled {
+    cursor: default;
+    filter: saturate(0.7) brightness(0.85);
+}
+
+.game-room-settings-button {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid #000;
+    background: #ffd43b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+}
+
+.game-room-settings-button img {
+    width: 22px;
+    height: 22px;
+    image-rendering: pixelated;
+}
+
+.game-room-settings-panel {
+    position: fixed;
+    right: 12px;
+    bottom: 70px;
+    width: min(360px, 92vw);
+    background: #111;
+    color: #fff;
+    border: 3px solid #ffd43b;
+    border-radius: 10px;
+    z-index: 4;
+}
+
+.settings-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settings-panel-header h5 {
+    margin: 0;
+}
+
+.settings-panel-body {
+    padding: 12px;
+}
+
+.settings-toggle-btn {
+    width: 100%;
+}
+
+/* Tablet layout adjustments */
+@media (max-width: 1024px) {
+    .game-room-machines {
+        width: 94vw;
+        grid-template-columns: repeat(3, minmax(90px, 1fr));
+    }
+
+    .machine-button img {
+        max-height: clamp(90px, 18vh, 180px);
+    }
+}
+
+/* Mobile layout adjustments */
+@media (max-width: 640px) {
+    .game-room-logo {
+        width: min(72vw, 360px);
+    }
+
+    .game-room-machines {
+        width: 90%;
+        max-width: 1400px;
+        bottom: 80px;
+    }
+
+    .machine-button img {
+        max-height: clamp(72px, 14vh, 120px);
+    }
+
+    .game-room-settings-panel {
+        right: 8px;
+        left: 8px;
+        width: auto;
+        bottom: 68px;
+    }
+}

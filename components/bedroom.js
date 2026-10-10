@@ -26,7 +26,7 @@ class Bedroom extends React.Component {
       className: "col-2"
     }, /*#__PURE__*/React.createElement("a", {
       className: "ml-2",
-      href: "hub.html"
+      onClick: () => load("hub")
     }, /*#__PURE__*/React.createElement("img", {
       className: "img-fluid",
       src: "bedroom-images/exitDoor.webp"
