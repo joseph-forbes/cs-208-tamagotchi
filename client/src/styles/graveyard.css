@@ -54,12 +54,14 @@
     top: 50%;
     transform: translateY(-50%) rotate(-90deg);
     left: 1em;
+    cursor: pointer;
 }
 .nextGraveArrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%) rotate(90deg);
     right: 1em;
+    cursor: pointer;
 }
 
 
