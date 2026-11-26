@@ -36,19 +36,19 @@ export type UserData = {
 
 const createUserTable = `CREATE TABLE IF NOT EXISTS users (
     uid INTEGER PRIMARY KEY AUTOINCREMENT,
-    pid TEXT,
-    initialized TEXT,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL
+    pid TEXT NOT NULL,
+    initialized TEXT NOT NULL,
+    username TEXT,
+    password TEXT
 )`;
 db.exec(createUserTable);
 
 const createGoobertTable = `CREATE TABLE IF NOT EXISTS gooberts (
     uid INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_slot TEXT,
+    user_slot TEXT NOT NULL,
     id TEXT NOT NULL,
     name TEXT NOT NULL,
-    room TEXT NOT NULL,
+    room TEXT,
 
     is_mutant INTEGER,
     mutant_type INTEGER,
@@ -65,7 +65,7 @@ const createGoobertTable = `CREATE TABLE IF NOT EXISTS gooberts (
 db.exec(createGoobertTable);
 const createGraveyardTable = `CREATE TABLE IF NOT EXISTS graveyard (
     uid INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_slot TEXT,
+    user_slot TEXT NOT NULL,
     id TEXT NOT NULL,
     name TEXT NOT NULL,
 

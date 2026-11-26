@@ -1,9 +1,9 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import http from "http";
 import { WebSocket, WebSocketServer } from "ws";
-import { createGoobert, deleteGoobert, deleteGraveyard, getSaveState, getUser, postToGraveyard, updateGoobert, updateGoobertProperty, updateUser } from "./data/dataProvider";
+import { createGoobert, createAccount, deleteGoobert, deleteGraveyard, getSaveState, getUser, postToGraveyard, updateGoobert, updateGoobertProperty, updateUser, createUser } from "./data/dataProvider";
 import Database from "better-sqlite3";
-import { postUser } from "./data/manipulate";
+import { postAccount } from "./data/manipulate";
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,6 +21,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
     next();
 })
+
+
+// ===== GET Requests =====
 app.get("/gooberts", async (request: Request, response: Response) =>{
     const pidString = request.query.pid;
     const pid = pidString as string;
@@ -31,12 +34,17 @@ app.get("/gooberts", async (request: Request, response: Response) =>{
     response.status(200).json(data);
 });
 app.get("/users", async (request: Request, response: Response) => {
+    console.log("Getting " + request.query.pid);
     const pidString = request.query.pid;
     const pid = pidString as string;
 
     const data = await getUser(pid);
+    console.log(data);
     response.status(200).json(data);
 })
+
+
+// ===== POST and PUT Gooberts
 app.post("/gooberts", async (request: Request, response: Response) =>{
     console.log("Creating a goobert...");
     const req = await JSON.parse(request.body.body);
@@ -57,35 +65,42 @@ app.put("/gooberts", async (request: Request, response: Response) =>{
 
     response.status(201).json(data);
 });
-app.put("/users", async (request: Request, response: Response) => {
-    const req = await JSON.parse(request.body.body);
-    const data = updateUser(req);
 
-    response.status(201).json(data);
-})
+// POST Goobert deaths to the graveyard
 app.post("/graveyard", async (request: Request, response: Response) =>{
     const req = await JSON.parse(request.body.body);
-
+    
     console.log("Killing " + req.data.id);
     postToGraveyard(req);
     const data = await deleteGoobert(req);
-
+    
     response.status(201).json(data);
 });
+
+// ===== POST and PUT Users =====
 app.post("/users", async (request: Request, response: Response) => {
     const req = await JSON.parse(request.body.body);
-    const result = postUser({
-        pid: req.pid,
-        initialized: req.initialized,
-        username: req.username,
-        password: req.password
-    });
+    let result;
+    if(req.username && req.password) {
+        result = await createAccount(req.pid, req.username, req.password);
+    } else {
+        console.log("Creating User...");
+        result = await createUser(req.pid);
+    }
     if(result) {
         response.status(201).json({message: "User created successfully!"});
     } else {
         response.status(403).json({message: "Username already taken."});
     }
 });
+app.put("/users", async (request: Request, response: Response) => {
+    const req = await JSON.parse(request.body.body);
+    const data = updateUser(req);
+
+    response.status(201).json(data);
+});
+
+// ===== DELETE Save Data =====
 app.delete("/gooberts", async (request: Request, response: Response) =>{
     const pidString = request.query.pid;
     const pid = pidString as string;
@@ -108,6 +123,8 @@ app.delete("/graveyard", async (request: Request, response: Response) =>{
     response.status(201).json(data);
 });
 
+
+// ===== WebSocket Connections =====
 wss.on("connection", (observer: WebSocket) => {
     console.log("User connected!");
     
@@ -116,7 +133,6 @@ wss.on("connection", (observer: WebSocket) => {
     observer.send(encodeMessage("connect", pid));
     observer.on("message", (message) => {
         const data = message;
-        
     })
     
 });

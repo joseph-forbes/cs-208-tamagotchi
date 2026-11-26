@@ -80,11 +80,27 @@ export type GoobertProps = {
     ref?: Ref<HTMLElement>;
 };
 
-export async function createUser(pid: string, username: string, password: string) {
+export async function createUser(pid: string, username?: string, password?: string) {
   const data = {pid: pid, username: username, password: password, initialized: "000"}
   const json = JSON.stringify(data);
   try {    
     const response = await axios.post(`${filePath}/users`, {
+      headers: {
+        Accept: "application/json"
+      },
+      body: json
+    });
+
+  } catch(error) {
+    // Server not running
+    console.log(error);
+  }
+}
+export async function createAccount(pid: string, username: string, password: string) {
+  const data = {pid: pid, username: username, password: password}
+  const json = JSON.stringify(data);
+  try {    
+    const response = await axios.put(`${filePath}/users`, {
       headers: {
         Accept: "application/json"
       },

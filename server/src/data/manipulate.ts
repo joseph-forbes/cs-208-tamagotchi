@@ -23,14 +23,14 @@ const goobertInsert = db.prepare(`
 `);
 export const post = (user_slot: string, goobert: GoobertData) => {
     goobert.name, goobert.room,
-    goobertInsert.run(
-        user_slot, goobert.id, goobert.name, goobert.room, 
+        goobertInsert.run(
+            user_slot, goobert.id, goobert.name, goobert.room,
 
-        goobert.mutantType,
-        goobert.fullness, goobert.entertainment, goobert.awakeness, goobert.cleanliness,
+            goobert.mutantType,
+            goobert.fullness, goobert.entertainment, goobert.awakeness, goobert.cleanliness,
 
-        goobert.appearance, goobert.accessories
-    );
+            goobert.appearance, goobert.accessories
+        );
 }
 const graveyardInsert = db.prepare(`
     INSERT OR IGNORE INTO graveyard (
@@ -46,7 +46,7 @@ const graveyardInsert = db.prepare(`
 export const postDeath = (user_slot: string, goobert: CorpseData) => {
     graveyardInsert.run(user_slot, goobert.id, goobert.name, goobert.appearance);
 }
-const userInsert = db.prepare(`
+const accountInsert = db.prepare(`
     INSERT OR IGNORE INTO users (
         pid,
         initialized,
@@ -56,13 +56,26 @@ const userInsert = db.prepare(`
         ?, ?, ?, ?
     )
 `);
-export const postUser = (user: UserData) => {
-    if(selectUsername.all(user.username).length > 0) {
+export const postAccount = (user: UserData) => {
+    if (selectUsername.all(user.username).length > 0) {
         return false;
     }
-    userInsert.run(user.pid, user.initialized, user.username, user.password);
+    accountInsert.run(user.pid, user.initialized, user.username, user.password);
     return true;
 }
+const userInsert = db.prepare(`
+    INSERT OR IGNORE INTO users (
+        pid,
+        initialized
+    ) VALUES (
+        ?, ?
+    )
+`);
+export const postUser = (user: any) => {
+    userInsert.run(user.pid, user.initialized);
+    return true;
+}
+
 // GET
 const selectAll = db.prepare(`
     SELECT 
@@ -114,16 +127,16 @@ export const validProperties = [
     "room",
     "is_mutant",
     "mutant_type",
-    "sleeping", 
-    "fullness", 
-    "entertainment", 
-    "awakeness", 
+    "sleeping",
+    "fullness",
+    "entertainment",
+    "awakeness",
     "cleanliness",
-    "appearance", 
+    "appearance",
     "accessories"
 ];
 export const put = (user_slot: string, id: string, property: string, value: number | string) => {
-    if(!validProperties.includes(property)) return;
+    if (!validProperties.includes(property)) return;
     const updateOne = db.prepare(`
         UPDATE gooberts
         SET ${property} = ?
@@ -138,6 +151,14 @@ export const initializeUser = (pid: string, initialized: string) => {
         WHERE pid = ?
     `);
     return updateOne.run(initialized, pid);
+};
+export const putAccount = (pid: string, username: string, password: string) => {
+    const updateOne = db.prepare(`
+        UPDATE users
+        SET username = ?, password = ?
+        WHERE pid = ?
+    `);
+    return updateOne.run(username, password, pid);
 };
 
 // DELETE

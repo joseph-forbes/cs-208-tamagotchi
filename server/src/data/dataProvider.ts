@@ -1,5 +1,5 @@
 import { CorpseData, UserData } from "./initialize";
-import {  db, get, getGraveyard, getUser as findUser, initializeUser, post, postDeath, postUser, put, remove, validProperties, removeGraveyard } from "./manipulate";
+import {  db, get, getGraveyard, getUser as findUser, initializeUser, post, postDeath, postAccount, put, remove, validProperties, removeGraveyard, postUser, putAccount } from "./manipulate";
 
 export type RequestBody = {
 	pid: string;
@@ -36,12 +36,21 @@ export const postToGraveyard = async (req: RequestBody) => {
 
 	return getSaveState(req);
 }
-export const createUser = async (req: RequestBody) => {
+export const createAccount = async (pid: string, username: string, password: string) => {
+	console.log("Creating: " + pid);
 	const user: UserData = {
-		pid: req.pid,
+		pid: pid,
 		initialized: "000",
-		username: req.data.username,
-		password: req.data.password
+		username: username,
+		password: password
+	}
+	return postAccount(user);
+}
+export const createUser = async (pid: string) => {
+	console.log("Creating: " + pid);
+	const user = {
+		pid: pid,
+		initialized: "000",
 	}
 	return postUser(user);
 }
@@ -76,7 +85,11 @@ export const updateGoobert = async (req: RequestBody) => {
 	return getSaveState(req);
 }
 export const updateUser = async (req: any) => {
-	initializeUser(req.pid, req.initialized);
+	if(req.initialized) {
+		initializeUser(req.pid, req.initialized);
+	} else if(req.username && req.password) {
+		putAccount(req.pid, req.username, req.password);
+	}
 
 	return getUser(req.pid);
 }

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { createContext, useContext, useState } from "react";
 import type { Goobert } from "./Goobert";
-import { saveGoobertToDatabase } from "./saveLoadGoobert";
+import { createUser, saveGoobertToDatabase } from "./saveLoadGoobert";
 
 type ServerContextType = {
     pid: string;
@@ -43,6 +43,7 @@ export function ServerProvider({ children }: any) {
                     if(localStorage.getItem("pid") == undefined) {
                         setPid(data.content);
                         localStorage.setItem("pid", data.content);
+                        createUser(data.content);
                     } else {
                         setPid(localStorage.getItem("pid") as string);
                     }
