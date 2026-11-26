@@ -259,7 +259,7 @@ const handleEmotion = (id: string) => {
     
     if(goobert.awakeness < 20) {
         // Tired
-        goobert.eyeExpression = (eyeEmotions.bored)
+        goobert.eyeExpression = (eyeEmotions.judgemental);
     }
 
     if(

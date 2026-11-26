@@ -80,6 +80,59 @@ export type GoobertProps = {
     ref?: Ref<HTMLElement>;
 };
 
+export async function createUser(pid: string, username: string, password: string) {
+  const data = {pid: pid, username: username, password: password, initialized: "000"}
+  const json = JSON.stringify(data);
+  try {    
+    const response = await axios.post(`${filePath}/users`, {
+      headers: {
+        Accept: "application/json"
+      },
+      body: json
+    });
+
+  } catch(error) {
+    // Server not running
+    console.log(error);
+  }
+}
+(window as any).createUser = createUser;
+export async function getUserByPid(pid: string): Promise<{pid: string, username: string, initialized: string} | undefined> {
+  try {
+    const params = new URLSearchParams({
+      pid: pid
+    });
+    const response = await axios.get(`${filePath}/users?${params.toString()}`, {
+    headers: {
+      Accept: "application/json"
+      }
+    });
+
+    // Get data from Server
+    const data = await response.data;
+    return data[0];
+
+  } catch(error) {
+    console.log(error);
+  }
+}
+(window as any).getUserByPid = getUserByPid;
+export async function updateUser(pid: string, initialized: string) {
+  const data = {pid: pid, initialized: initialized}
+  const json = JSON.stringify(data);
+  try {    
+    const response = await axios.put(`${filePath}/users`, {
+      headers: {
+        Accept: "application/json"
+      },
+      body: json
+    });
+  } catch(error) {
+    // Server not running
+    console.log(error);
+  }
+}
+(window as any).updateUser = updateUser;
 
 export async function getState(pid: string, saveSlot: number) {
   try {
@@ -95,10 +148,7 @@ export async function getState(pid: string, saveSlot: number) {
 
     // Get data from Server
     const data = await response.data;
-    console.log(`Data: `, data);
     const gooberts: GoobertProps[] = data.gooberts ? data.gooberts.map((goobert: GoobertData) => {
-      console.log(goobert);
-
       const appearanceArray = goobert.appearance.split("_");
       const appearanceProps = {
         bodyType: parseInt(appearanceArray[0]!),
@@ -285,35 +335,39 @@ export const saveAccessories = async (pid: string, saveSlot: number, goobert: Go
     stringifyAccessories(goobert)
   );
 }
-export async function deleteGoobert(pid: string, saveSlot: number, goobertId: number) {
-    const data = goobertId;
-    const request: RequestBody = {
+export async function deleteGoobert(pid: string, saveSlot: number, goobertId: string) {
+    const params = new URLSearchParams({
       pid: pid,
-      saveSlot: saveSlot,
-      data: data
-    }
-    const json = JSON.stringify(request);
+      slot: saveSlot.toString(),
+      goobertId: goobertId
+    });
   try {    
-    const response = await axios.delete(`${filePath}/gooberts`, {
-    headers: {
-      Accept: "application/json"
-    },
-      // body: json
+    const response = await axios.delete(`${filePath}/gooberts?${params.toString()}`, {
+      headers: {
+        Accept: "application/json"
+      }
     });
 
   } catch(error) {
-    // Server not running
-    console.log("failed to connect.");
     console.log(error);
-
-    const json = await localStorage.getItem("slot" + saveSlot);
-    if(!json) return;
-    const data = JSON.parse(json) as GoobertProps[];
-
-    return data;
   }
 }
+export async function deleteGraveyard(pid: string, saveSlot: number) {
+    const params = new URLSearchParams({
+      pid: pid,
+      slot: saveSlot.toString()
+    });
+  try {    
+    const response = await axios.delete(`${filePath}/graveyard?${params.toString()}`, {
+      headers: {
+        Accept: "application/json"
+      }
+    });
 
+  } catch(error) {
+    console.log(error);
+  }
+}
 
 const getGoobertData = (goobert: Goobert) => {
   const appearance = stringifyAppearance(goobert);

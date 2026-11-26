@@ -1,5 +1,5 @@
-import { CorpseData } from "./initialize";
-import {  db, get, getGraveyard, post, postDeath, put, remove, validProperties } from "./manipulate";
+import { CorpseData, UserData } from "./initialize";
+import {  db, get, getGraveyard, getUser as findUser, initializeUser, post, postDeath, postUser, put, remove, validProperties, removeGraveyard } from "./manipulate";
 
 export type RequestBody = {
 	pid: string;
@@ -9,13 +9,17 @@ export type RequestBody = {
 export const getSaveState = async (req: RequestBody) => {
 	const gooberts = get(getUserSlot(req.pid, req.saveSlot));
 	const graveyard = getGraveyard(getUserSlot(req.pid, req.saveSlot));
-	console.log("Graveyard:", graveyard)
 	const saveState = {
 		gooberts: gooberts,
 		graveyard: graveyard
 	}
 	return saveState;
 }
+export const getUser = async (pid: string) => {
+	return findUser(pid);
+}
+
+
 export const createGoobert = async (req: RequestBody) => {
 	post(getUserSlot(req.pid, req.saveSlot), req.data);
 
@@ -32,7 +36,18 @@ export const postToGraveyard = async (req: RequestBody) => {
 
 	return getSaveState(req);
 }
-export const updateGoobertProperty = async (req: RequestBody) => {
+export const createUser = async (req: RequestBody) => {
+	const user: UserData = {
+		pid: req.pid,
+		initialized: "000",
+		username: req.data.username,
+		password: req.data.password
+	}
+	return postUser(user);
+}
+
+
+export const updateGoobertProperty = async (req: any) => {
 	const goobertId = req.data.goobertId;
 	const property = req.data.stat;
 	const value = req.data.value;
@@ -50,38 +65,30 @@ export const updateGoobert = async (req: RequestBody) => {
 	const user_slot = getUserSlot(req.pid, req.saveSlot);
 
 	for(let property of validProperties) {
-		// console.log({
-		// 	expectedId: goobert.id,
-		// 	expectedSlot: user_slot,
-		// 	found: db.prepare(`
-		// 		SELECT *
-		// 		FROM gooberts
-		// 		WHERE user_slot = ? AND id = ?
-		// 	`).get(user_slot, goobert.id)
-		// });
-
 		const result = put(
 			user_slot,
 			goobert.id,
 			property,
 			goobert[property]
 		);
-
-		// console.log(
-		// 	`Updating ${property}:`,
-		// 	goobert[property],
-		// 	"| Changes:",
-		// 	result?.changes
-		// );
-
 	}
 
 	return getSaveState(req);
 }
+export const updateUser = async (req: any) => {
+	initializeUser(req.pid, req.initialized);
+
+	return getUser(req.pid);
+}
 
 export const deleteGoobert = async (req: RequestBody) => {
-	const goobert = req.data;
-	remove(getUserSlot(req.pid, req.saveSlot), goobert.id);
+	const goobertId = req.data;
+	remove(getUserSlot(req.pid, req.saveSlot), goobertId);
+
+	return getSaveState(req);
+}
+export const deleteGraveyard = async (req: any) => {
+	removeGraveyard(getUserSlot(req.pid, req.saveSlot));
 
 	return getSaveState(req);
 }

@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import type { Corpse, Goobert } from "./Goobert";
 import { rooms } from "./App";
 import { MutantType } from "./Mutant";
-import { getState, saveAccessories, saveGoobertToDatabase, updateGoobert, updateGoobertProperty } from "./saveLoadGoobert";
+import { deleteGoobert, deleteGraveyard, getState, getUserByPid, saveAccessories, saveGoobertToDatabase, updateGoobert, updateGoobertProperty, updateUser } from "./saveLoadGoobert";
 import { goobertDeathRattle } from "./components/audio";
 import useServer from "./ServerContext";
 import { globalTick } from "./globalTick";
@@ -66,7 +66,7 @@ interface GoobertContextType {
     ) => void;
 
     loadSlot: (saveSlot: number) => void
-    newGame: () => void
+    newGame: (slot: number) => void
 
     updatePosition: (
         id: string,
@@ -379,11 +379,31 @@ export function GoobertProvider({ children }: any) {
     }
     (window as any).loadSlot = loadSlot;
 
-    const newGame = () => {
+    const newGame = async (slot: number) => {
         setGooberts([]);
         killGooberts([]);
 
-        localStorage.removeItem("currentSlot");
+        localStorage.setItem("currentSlot", slot.toString());
+        if(!pid)
+            pid = localStorage.getItem("pid") ?? "";
+        if(pid.length > 0) {
+            const s = (await getUserByPid(pid))?.initialized;
+            if(s) {
+                const initialized = s.substring(0, slot - 1) + "1" + s.substring(slot);
+                updateUser(pid, initialized);
+                let state = await getState(pid, slot);
+                if(state) {
+                    for(let goobert of state.gooberts) {
+                        await deleteGoobert(pid, slot, goobert.id);
+                    }
+                    deleteGraveyard(pid, slot);
+                    // state = await getState(pid, slot); 
+                }
+            }
+        }
+
+        setGooberts([]);
+        killGooberts([]);
     }
 
     //KILL GOOBERTS DEAD!!!!!
@@ -423,7 +443,7 @@ export function GoobertProvider({ children }: any) {
         let newArray: Goobert[] = [...gooberts];
         // Update goobert position
         for(let goobert of newArray) {
-            if(goobert.id == id) {
+            if(goobert.id == id && !goobert.isUi) {
                 goobert[property] = value;
 
                 const saveSlot = localStorage.getItem("currentSlot");

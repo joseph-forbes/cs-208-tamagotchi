@@ -382,7 +382,6 @@ export default function Goobert(props: Goobert): React.JSX.Element {
     */
     const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
         if (props.sleeping > 0) {
-            console.log("Why are you poking a sleeping goobert, you monster");
             goobertClickSound.play();
             updateProp(props.id, "sleeping", 0);
         }
@@ -443,7 +442,6 @@ export default function Goobert(props: Goobert): React.JSX.Element {
         }
 
         if (!movedRef.current) {
-            console.log(`${props.id} says, "I've been poked! and I'm in the ${props.room}"`);
             // Play the Goobert click sound
             goobertClickSound.play();
             if(props.onGoobertSelected) props.onGoobertSelected();

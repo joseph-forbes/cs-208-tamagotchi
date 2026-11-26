@@ -4,7 +4,6 @@ import { doorOpenSound, goobertSpookSound } from "./audio";
 import { load, rooms } from "../App";
 import GoobertElement, {type Corpse, type Goobert} from "../Goobert";
 import useGooberts, { getDeceased } from "../GoobertContext";
-import UIGoobertCard from "./ui-script";
 
 export default function Graveyard() {
     let { doorRefs } = useGooberts();
@@ -52,20 +51,22 @@ export default function Graveyard() {
                 ) : (
                     <>
                         <div className="cemetary-container">
-                            {deceasedPages[deceasedPage]!.map(row => {
-                                return <div className="cemetary-row">
+                            {deceasedPages[deceasedPage]!.map((row, j) => {
+                                return <div className="cemetary-row" key={j}>
                                     {row.map((goobert, i) => <Headstone goobert={goobert} stoneType={i} key={i} />)}
                                 </div>
                             })}
                         </div>
                         {deceasedPage  > 0 && 
                             <img className="prevGraveArrow" src="/images/graveyard/graveyardArrow.webp" 
-                                onClick={() => setDeceasedPage(deceasedPage - 1)}
+                                onClick={() => setDeceasedPage(deceasedPage - 1)} 
+                                alt="Go back towards the entrance"
                             />
                         } 
                         {deceasedPage < deceasedPages.length - 1 && 
                             <img className="nextGraveArrow" src="/images/graveyard/graveyardArrow.webp" 
                                 onClick={() => setDeceasedPage(deceasedPage + 1)}
+                                alt="Continue down the graveyard path"
                             />
                         } 
                     </>
@@ -102,7 +103,6 @@ interface Props {
         return(
         <div className="Headstone" 
         onPointerDown={() => {
-            console.log("Setting visible");
             setVisible(!isVisible);
             goobertSpookSound.play();
         }}>

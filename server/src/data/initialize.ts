@@ -25,12 +25,19 @@ export type CorpseData = {
 
     appearance: string;
 };
+export type UserData = {
+    pid: string,
+    initialized: string,
+    username: string,
+    password: string
+}
 
 
 
 const createUserTable = `CREATE TABLE IF NOT EXISTS users (
     uid INTEGER PRIMARY KEY AUTOINCREMENT,
     pid TEXT,
+    initialized TEXT,
     username TEXT NOT NULL,
     password TEXT NOT NULL
 )`;
