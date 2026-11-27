@@ -178,7 +178,7 @@ function checkPipeIntersection() {
             } else {
                 // Restore Cleanliness when Goobert touches water.
                 if (gameGoobert && cleanlinessReward) {
-                    cleanlinessReward(0.2);
+                    cleanlinessReward(0.1 + (pipeSpeed - 10) / 30);
                 }
             }
         }
@@ -208,7 +208,8 @@ const assets = {
     size: 64,
     totalBodies: 7,
     totalEyes: 10,
-    totalMouths: 11
+    totalMouths: 11,
+    mouthExpressions: 6
 }
 function createBirdDiv() {
     let cell = document.createElement("div");
@@ -254,7 +255,7 @@ function createEyeDiv() {
         // Goobert mouth
         const mouth = document.createElement("div");
         mouth.style.backgroundSize = 
-            scale * assets.size * assets.totalBodies + "px " + 
+            scale * assets.size * assets.mouthExpressions + "px " + 
             scale * assets.size * assets.totalMouths + "px";
         const goobertMouth = {
             type: gameGoobert.mouthType * width,

@@ -20,6 +20,7 @@ body {
 }
 .pipeGroup {
     position: absolute;
+    z-index: 2;
 }
 .pipe {
     background-size: 400px 480px;
@@ -27,7 +28,7 @@ body {
 }
 .water {
     background-color: rgba(0,0,255,0.5);
-    z-index: 1;
+    z-index: 5;
     margin-left: auto;
     margin-right: auto;
 }
@@ -124,6 +125,7 @@ body {
     padding: 0.3em;
     border-color: #fff;
     background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
 }
 .cleanliness-label > input {
     accent-color: #14a9ff;

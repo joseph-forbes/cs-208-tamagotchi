@@ -31,8 +31,24 @@ body {
     width: 64px;
     height: 64px;
 
-    background-image: url("../images/games/snake.png");
+    transform-origin: center center;
+
+    /* background-image: url("../images/games/snake.png"); */
 }
+.eyes {
+    position: absolute;
+    z-index: 2;
+    background-image: url("../images/goobert-parts/208-tamagotchi-eyes.png");
+}
+.mouth {
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    z-index: 2;
+
+    background-image: url("../images/goobert-parts/208-tamagotchi-mouths.png");
+}
+
 #main {
     max-width: 100%;
     margin: 0 auto;

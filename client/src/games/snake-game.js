@@ -1,7 +1,8 @@
-import { body, gridSize, height, keys, refreshGameBody, resetGame, setBodySize, setHeight, setWidth, start, stopGame, width } from "./games-global.ts";
+import { body, game, gridSize, height, keys, refreshGameBody, resetGame, setBodySize, setHeight, setWidth, start, stopGame, width } from "./games-global.ts";
 import { gameGoobert } from "../components/game-room.tsx";
 import { gameOverSound, snakeEatingSound } from "../components/audio.ts";
 import "./snake-stylesheet.css";
+import recolorSpriteSheet from "./recolor.js";
 
 // Callback used to restore Cleanliness through React context.
 let fullnessReward = null;
@@ -9,6 +10,100 @@ let fullnessReward = null;
 // Allow the React component to register its reward function.
 export function setFullnessReward(callback) {
     fullnessReward = callback;
+}
+
+const img = new Image();
+img.src = "../images/games/snake.png";
+const heads = new Image();
+heads.src = "../images/goobert-parts/208-tamagotchi-bodies.png";
+const newImg = document.createElement('canvas');
+
+let eyes;
+function initEyes() {
+    eyes = document.createElement("div");
+    eyes.classList.add("eyes");
+    
+    eyes.style.width = gridSize + "px";
+    eyes.style.height = gridSize + "px";
+
+    const scale = gridSize / 64;
+    eyes.style.backgroundSize = 
+        scale * assets.size * assets.eyeExpressions + "px " + 
+        scale * assets.size * assets.totalEyes + "px";
+    const goobertEyes = {
+        type: gameGoobert ? gameGoobert.eyeType * gridSize : gridSize * 2,
+        expression: gameGoobert ? gameGoobert.eyeExpression * gridSize : 0
+    }
+    eyes.style.backgroundPosition = `-${goobertEyes.expression}px -${goobertEyes.type}px`;
+
+    if(gameGoobert) {
+        const mouth = document.createElement("div");
+        mouth.style.backgroundSize = 
+            scale * assets.size * assets.mouthExpressions + "px " + 
+            scale * assets.size * assets.totalMouths + "px";
+        console.log(gameGoobert.mouthExpression);
+        const goobertMouth = {
+            type: gameGoobert.mouthType * gridSize,
+            // expression: 0
+            expression: gameGoobert.mouthExpression * gridSize
+        }
+        mouth.style.backgroundPosition = `-${goobertMouth.expression}px -${goobertMouth.type}px`;
+
+        mouth.classList.add("mouth");
+        mouth.style.width = gridSize + "px";
+        mouth.style.height = gridSize + "px";
+        eyes.appendChild(mouth);
+    }
+}
+
+const hues = [];
+let hue;
+
+img.onload = () => {
+    // Update head
+    newImg.width = img.width;
+    newImg.height = img.height;
+    const ctx = newImg.getContext('2d');
+    ctx.drawImage(img, 0, 0, assets.size * 4, assets.size * 4, 0, 0, assets.size * 4, assets.size * 4);
+
+    const headPos = gameGoobert ? gameGoobert.bodyType : 2
+    for(let i = 0; i < 4; i++) {
+        ctx.drawImage(
+            heads, 
+            0, headPos * assets.size, assets.size, assets.size, 
+            assets.head * assets.size, i * assets.size, assets.size, assets.size
+        )
+    }
+
+    hues.push(recolorSpriteSheet(newImg, 0));
+    hues.push(recolorSpriteSheet(newImg, 30));
+    hues.push(recolorSpriteSheet(newImg, 60));
+    hues.push(recolorSpriteSheet(newImg, 120));
+    hues.push(recolorSpriteSheet(newImg, 210));
+    hues.push(recolorSpriteSheet(newImg, 240));
+    hues.push(recolorSpriteSheet(newImg, 270));
+
+    hue = gameGoobert ? hues[gameGoobert.bodyColor] : hues[0];
+}
+const initializeHues = () => {
+    const ctx = newImg.getContext('2d');
+    ctx.clearRect(assets.head * assets.size, 0, assets.size, newImg.height);
+    const headPos = gameGoobert ? gameGoobert.bodyType : 2
+    for(let i = 0; i < 4; i++) {
+        ctx.drawImage(
+            heads, 
+            0, headPos * assets.size, assets.size, assets.size, 
+            assets.head * assets.size, i * assets.size, assets.size, assets.size
+        )
+    }
+
+    hues[0] = (recolorSpriteSheet(newImg, 0));
+    hues[1] = (recolorSpriteSheet(newImg, 30));
+    hues[2] = (recolorSpriteSheet(newImg, 60));
+    hues[3] = (recolorSpriteSheet(newImg, 120));
+    hues[4] = (recolorSpriteSheet(newImg, 210));
+    hues[5] = (recolorSpriteSheet(newImg, 240));
+    hues[6] = (recolorSpriteSheet(newImg, 270));
 }
 
 export function initSnakeGame(boardWidth, boardHeight) {
@@ -20,6 +115,8 @@ export function initSnakeGame(boardWidth, boardHeight) {
     }
     if (!body) return;
 
+    initializeHues();
+
     setWidth(Math.max(6, parseInt(boardWidth, 10) || 15) - 1);
     setHeight(Math.max(6, parseInt(boardHeight, 10) || 15) - 1);
     setBodySize();
@@ -29,6 +126,10 @@ export function initSnakeGame(boardWidth, boardHeight) {
     snakeDivs.id = "snakeDivs";
     body.appendChild(snakeDivs);
 
+    initEyes();
+    snakeDivs.appendChild(eyes);
+
+    hue = gameGoobert ? hues[gameGoobert.bodyColor] : hues[0];
     snake = createInitialSnake();
     apple = createInitialApple();
 
@@ -56,7 +157,11 @@ const assets = {
     up: 3,
     head: 4,
 
-    size: 64 // Asset size in pixels
+    size: 64, // Asset size in pixels
+    eyeExpressions: 7,
+    mouthExpressions: 6,
+    totalEyes: 10,
+    totalMouths: 11
 }
 const snakeDivs = document.createElement("div");
 let snake = null;
@@ -99,8 +204,10 @@ function moveSnake() {
     // Update snake head based on current head
     let currentSquare = snake.head;
     snake.head = snake.positions[snake.positions.length - 1];
+
     currentSquare.asset[1] = snake.direction;
     updateImage(currentSquare);
+    setObjPosition(currentSquare);
 
     // Update head x
     snake.head.x = currentSquare.x + snake.velocity.x;
@@ -127,7 +234,6 @@ function moveSnake() {
     
         snake.positions.splice(snake.positions.length - 1);
         snake.positions.unshift(snake.head);
-    
         setObjPosition(snake.head);
     
         for (let position of snake.positions) {
@@ -150,31 +256,30 @@ function moveSnake() {
     }
 }
 function createSnakeDiv(x, y, id, asset) {
-    let cell = document.createElement("div");
+    let canvas = document.createElement("canvas");
+    canvas.width = gridSize;
+    canvas.height = gridSize;
+    let ctx = canvas.getContext("2d");
 
-    let scale = gridSize / assets.size;
-    cell.style.backgroundSize = 
-        scale * assets.size * 5 + "px " + 
-        scale * assets.size * 4 + "px";
-    cell.style.backgroundPosition = "0 0";
+    ctx.drawImage(hue, 0, 0, assets.size * 5, assets.size * 4);
 
-    setPosition(cell, x, y);
-    cell.id = id;
-    cell.classList.add("snake");
-    cell.style.width = gridSize + "px";
-    cell.style.height = gridSize + "px";
+    setPosition(canvas, x, y);
+    canvas.id = id;
+    canvas.classList.add("snake");
+    canvas.style.width = gridSize + "px";
+    canvas.style.height = gridSize + "px";
 
-    snakeDivs.appendChild(cell);
+    snakeDivs.appendChild(canvas);
 
-    return cell;
+    return canvas;
 }
-function updateImage(position) {
-    let scale = gridSize / assets.size;
-    let sx = position.asset[1] * assets.size;
-    let sy = position.asset[0] * assets.size;
+function updateImage(cell) {
+    let sx = cell.asset[1] * assets.size;
+    let sy = cell.asset[0] * assets.size;
 
-    position.div.style.backgroundPosition = 
-        `${(-sx * scale)}px ${(-sy * scale)}px`;
+    let ctx = cell.div.getContext("2d");
+    ctx.clearRect(0,0,cell.div.width, cell.div.height);
+    ctx.drawImage(hue, sx, sy, assets.size, assets.size, 0, 0, gridSize, gridSize);
 }
 function createAppleDiv(x, y) {
     let cell = document.createElement("div");
@@ -196,7 +301,26 @@ function setPosition(div, x, y) {
     div.style.top = y * gridSize + "px";
 }
 function setObjPosition(obj) {
-    setPosition(obj.div, obj.x, obj.y);
+    if(obj == snake.head) {
+        let xOffset = 0;
+        if(snake.direction == assets.right) xOffset = - 1/4;
+        if(snake.direction == assets.left) xOffset = 1/4;
+        let yOffset = 1 / 8;
+        if(snake.direction == assets.up) yOffset = - 1/4;
+        if(snake.direction == assets.down) yOffset = 1/4;
+
+        setPosition(obj.div, obj.x + (xOffset), obj.y + yOffset);
+        obj.div.style.transform = "scale(1.2)";
+
+        yOffset = 0;
+        if(snake.direction == assets.up) yOffset = 1/4;
+        if(snake.direction == assets.down) yOffset = -1/4;
+        eyes.style.left = (obj.x - xOffset * 1.5) * gridSize + "px";
+        eyes.style.top = (obj.y + yOffset * 1.5) * gridSize + "px";
+    } else {
+        setPosition(obj.div, obj.x, obj.y);
+        obj.div.style.transform = "scale(1)";
+    }
 }
 function eatApple() {
     // Play the eating sound when Snake collects apple
@@ -215,7 +339,10 @@ function eatApple() {
     apple.y = Math.floor(space.y);
     setObjPosition(apple);
 
+    const prevHead = snake.head;
     snake.head = newSquare;
+    setObjPosition(prevHead);
+    setObjPosition(newSquare);
     updateImage(newSquare);
 
     if(gameGoobert) {
