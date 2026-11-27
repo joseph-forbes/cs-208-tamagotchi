@@ -81,7 +81,7 @@ img.onload = () => {
     hues.push(recolorSpriteSheet(newImg, 120));
     hues.push(recolorSpriteSheet(newImg, 210));
     hues.push(recolorSpriteSheet(newImg, 240));
-    hues.push(recolorSpriteSheet(newImg, 270));
+    hues.push(recolorSpriteSheet(newImg, 280));
 
     hue = gameGoobert ? hues[gameGoobert.bodyColor] : hues[0];
 }
@@ -103,7 +103,7 @@ const initializeHues = () => {
     hues[3] = (recolorSpriteSheet(newImg, 120));
     hues[4] = (recolorSpriteSheet(newImg, 210));
     hues[5] = (recolorSpriteSheet(newImg, 240));
-    hues[6] = (recolorSpriteSheet(newImg, 270));
+    hues[6] = (recolorSpriteSheet(newImg, 280));
 }
 
 export function initSnakeGame(boardWidth, boardHeight) {
