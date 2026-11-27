@@ -19,7 +19,7 @@ interface Props {
     pipes: PipeState[][];
     setPipes: React.Dispatch<React.SetStateAction<PipeState[][]>>;
     onRotate: (x: number, y: number) => void;
-    checkAnswer: (pipes: PipeState[][]) => void;
+    // checkAnswer: (pipes: PipeState[][]) => void;
 }
 type PipeState = {
     pipeType: string;
@@ -30,7 +30,7 @@ type PipeState = {
     y: number
 }
 
-export const PipeObject = ({startblue, pipeType, initRotation, x, y, pipes, onRotate, checkAnswer}: Props) => {   
+export const PipeObject = ({startblue, pipeType, initRotation, x, y, pipes, onRotate, /*checkAnswer*/}: Props) => {   
     const getPipeState = () => {
         if(pipes[y] == undefined || pipes[y][x] == undefined) {
             return ({x: x, y: y, rotation: initRotation, pipeType: pipeType, isBlue: startblue});
@@ -315,6 +315,8 @@ export default function Pipelined() {
                 }
             }
         }
+
+         console.log(blues);
         
         if (blues === 36) {
             rewardGoobert(1000000000)
@@ -330,28 +332,8 @@ export default function Pipelined() {
 
     // const ImageSwapGif: React.FC = () => {
     // };
-    const PipeLever = () => {
-        
-        
-        return(
-            <div className="btn shower-lever" style={{
-                padding: 0,
-                border: 'none'
-            }}>
-                <img src={`../images/games/showerLeverUp.webp`} alt="" style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                    }} onClick={() => {
-                        checkAnswer(pipes);
-                        pullLever((prev) => !prev)
-                    }}/>
-            </div>
-        )
-    };
     
-
+    
 	return (
         <main className="pipelined">
             <button type="button" className="frogoobert-exit" onClick={() => {
@@ -367,15 +349,15 @@ export default function Pipelined() {
                         opacity: 0.0,
                     }}/>
                 )
-
-                }
+                
+            }
                 <GoobertElement 
                     {...gameGoobert!}
                     isUi={true}
                     x={32}
                     y={64}
                     className="shower-goobert"
-                />
+                    />
                 <img src="../images/games/showerFloor.webp" alt="" className="shower-floor"/>
             </div>
 
@@ -394,9 +376,9 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />
-                    )}
+                            // checkAnswer={checkAnswer}
+                            />
+                        )}
                     </div>
                     <div className="row">
                         {pipesTwo.map((pipe, i) => <PipeObject
@@ -405,8 +387,8 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />			
+                            // checkAnswer={checkAnswer}
+                            />			
                         )}
                     </div>
                     <div className="row">
@@ -416,8 +398,8 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />			
+                            // checkAnswer={checkAnswer}
+                            />			
                         )}
                     </div>
                     <div className="row">
@@ -427,8 +409,8 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />			
+                            // checkAnswer={checkAnswer}
+                            />			
                         )}
                     </div>
                     <div className="row">
@@ -438,8 +420,8 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />			
+                            // checkAnswer={checkAnswer}
+                            />			
                         )}
                     </div>
                     <div className="row">
@@ -449,18 +431,47 @@ export default function Pipelined() {
                             pipes = {pipes}
                             setPipes = {setPipes}
                             onRotate={rotatePipe}
-                            checkAnswer={checkAnswer}
-                        />			
+                            // checkAnswer={checkAnswer}
+                            />			
                         )}
                     </div>
                 </>
             </div>
             {!gameWon ? (
-                <PipeLever/>
+                <PipeLever 
+                    checkAnswer={checkAnswer} 
+                    pullLever={pullLever} 
+                    pipes={pipes} 
+                />
             ) : <img src='../images/games/showerLeverDown.webp' alt="" style={{
-                        display: 'block',
-                    }}/>}
+                display: 'block',
+            }}/>}
         </main>
 	);
 };
 
+
+const PipeLever = ({checkAnswer, pullLever, pipes}: any) => {
+    console.log("creating pipe lever!");
+    
+    return(
+        <div className="btn shower-lever" 
+            style={{
+                padding: 0,
+                border: 'none'
+            }}
+            onClick={() => {
+                checkAnswer(pipes);
+                pullLever((prev: any) => !prev)
+            }}
+        >
+            <img src={`../images/games/showerLeverUp.webp`} alt="" style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                }} 
+            />
+        </div>
+    )
+};
