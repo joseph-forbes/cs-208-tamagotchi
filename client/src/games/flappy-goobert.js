@@ -36,6 +36,7 @@ export function initFlappyGoobert() {
     pipes = [];
     countdown = 0;
     score = 0;
+    pipeSpeed = 10;
 
     bird.x = gridSize * 3;
     bird.y = Math.floor((height * gridSize) / 2);
@@ -49,6 +50,7 @@ export function initFlappyGoobert() {
     start(30, flappyGameloop);
 }
 
+let pipeSpeed = 10;
 let bird = {
     x: gridSize * 3,
     y: 10,
@@ -73,7 +75,7 @@ class Pipe {
     }
 
     move() {
-        this.x -= 10 * gridSize / 64;
+        this.x -= pipeSpeed * gridSize / 64;
         if(this.x < -gridSize * this.width) {
             body.removeChild(this.div);
             this.dead = true;
@@ -84,7 +86,7 @@ class Pipe {
 function flappyGameloop() {
     renderFlappy(bird.div, bird.x, bird.y);
     bird.eyes.style.top = 
-        Math.max(Math.min((bird.velocity) * (gridSize / 64), gridSize * 0.5), -(gridSize * 0.5)) 
+        Math.max(Math.min((bird.velocity) * (gridSize / 30), gridSize * 0.5), -(gridSize * 0.5)) 
         + "px";
 
     if (gameOver) return;
@@ -96,7 +98,7 @@ function flappyGameloop() {
 
     if(countdown <= 0) {
         pipes.push(new Pipe());
-        countdown = Math.floor(Math.random() * 60) + 45; 
+        countdown = Math.floor(Math.random() * (65 - (pipeSpeed / 2))) + 55 - pipeSpeed; 
     }
     for(let i = 0; i < pipes.length; i++) {
         let pipe = pipes[i];
@@ -108,6 +110,7 @@ function flappyGameloop() {
             if (!pipe.counted && (pipe.x + pipe.width * gridSize) < bird.x) {
                 pipe.counted = true;
                 score += 1;
+                pipeSpeed = Math.min(pipeSpeed + 0.5, 25);
                 // Play a sound when Goobert earns a point.
                 flappyGoobertPointSound.play();
                 updateScoreDisplay();
@@ -201,19 +204,31 @@ function endFlappyRound() {
     }
 }
 
+const assets = {
+    size: 64,
+    totalBodies: 7,
+    totalEyes: 10,
+    totalMouths: 11
+}
 function createBirdDiv() {
     let cell = document.createElement("div");
 
+    let width = gridSize * 1.25;
+    let scale = width / assets.size;
     cell.style.backgroundSize = 
-        gridSize + "px " + 
-        gridSize + "px";
-    cell.style.backgroundPosition = "0 0";
+        scale * assets.size * assets.totalBodies + "px " + 
+        scale * assets.size * assets.totalBodies + "px";
+    const goobertBody = {
+        type: gameGoobert ? gameGoobert.bodyType * width : 0,
+        color: gameGoobert ? gameGoobert.bodyColor * width : 0
+    }
+    cell.style.backgroundPosition = `-${goobertBody.color}px -${goobertBody.type}px`;
 
     renderFlappy(cell, bird.x, bird.y);
     cell.id = "bird";
     cell.classList.add("bird");
-    cell.style.width = gridSize + "px";
-    cell.style.height = gridSize + "px";
+    cell.style.width = width + "px";
+    cell.style.height = width + "px";
 
     body.appendChild(cell);
 
@@ -222,15 +237,41 @@ function createBirdDiv() {
 function createEyeDiv() {
     let cell = document.createElement("div");
 
+    console.log(gridSize);
+
+    let width = gridSize * 1.25;
+    let scale = width / assets.size;
     cell.style.backgroundSize = 
-        gridSize + "px " + 
-        gridSize + "px";
-    cell.style.backgroundPosition = "0 0";
+        scale * assets.size * assets.totalBodies + "px " + 
+        scale * assets.size * assets.totalEyes + "px";
+    const goobertEyes = {
+        type: gameGoobert ? gameGoobert.eyeType * width : width * 2,
+        expression: gameGoobert ? gameGoobert.eyeExpression * width : 0
+    }
+    cell.style.backgroundPosition = `-${goobertEyes.expression}px -${goobertEyes.type}px`
+
+    if(gameGoobert) {
+        // Goobert mouth
+        const mouth = document.createElement("div");
+        mouth.style.backgroundSize = 
+            scale * assets.size * assets.totalBodies + "px " + 
+            scale * assets.size * assets.totalMouths + "px";
+        const goobertMouth = {
+            type: gameGoobert.mouthType * width,
+            expression: gameGoobert.mouthExpression * width
+        }
+        mouth.style.backgroundPosition = `-${goobertMouth.expression}px -${goobertMouth.type}px`;
+
+        mouth.classList.add("mouth");
+        mouth.style.width = width + "px";
+        mouth.style.height = width + "px";
+        cell.appendChild(mouth);
+    }
 
     cell.classList.add("eyes");
     cell.style.left = gridSize * 0.4 + "px";
-    cell.style.width = gridSize + "px";
-    cell.style.height = gridSize + "px";
+    cell.style.width = width + "px";
+    cell.style.height = width + "px";
 
     body.appendChild(cell);
 

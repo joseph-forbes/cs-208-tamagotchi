@@ -37,13 +37,20 @@ body {
     width: 64em;
     height: 64em;
 
-    background-image: url("../images/games/bird.png");
+    background-image: url("../images/goobert-parts/208-tamagotchi-bodies.png");
 }
 .eyes {
     position: relative;
     left: 0.8em;
 
-    background-image: url("../images/games/eyes.png");
+    background-image: url("../images/goobert-parts/208-tamagotchi-eyes.png");
+}
+.mouth {
+    position: absolute;
+    left: 0;
+    top: 1em;
+
+    background-image: url("../images/goobert-parts/208-tamagotchi-mouths.png");
 }
 #main {
     max-width: 100%;

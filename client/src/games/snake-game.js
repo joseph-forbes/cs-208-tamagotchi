@@ -152,7 +152,7 @@ function moveSnake() {
 function createSnakeDiv(x, y, id, asset) {
     let cell = document.createElement("div");
 
-    let scale = gridSize / assets.size
+    let scale = gridSize / assets.size;
     cell.style.backgroundSize = 
         scale * assets.size * 5 + "px " + 
         scale * assets.size * 4 + "px";
